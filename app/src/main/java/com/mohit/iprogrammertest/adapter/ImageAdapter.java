@@ -27,6 +27,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
     Context context;
     List<ImageModel> imageModels;
     List<ImageModel> imageInDatabase;
+    List<ImageModel> finalImageInDatabase;
     DatabaseInstance databaseInstance;
     ListView listView;
 
@@ -35,6 +36,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
         this.imageModels = imageModels;
         this.listView = listView;
         imageInDatabase = new ArrayList<>();
+        finalImageInDatabase = new ArrayList<>();
     }
 
     @NonNull
@@ -44,12 +46,13 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
                 inflate(R.layout.layout_image_details_row, parent, false);
         databaseInstance = new DatabaseInstance(context);
         imageInDatabase = databaseInstance.getAllImages();
+        finalImageInDatabase.clear();
+        finalImageInDatabase.addAll(imageInDatabase);
         return new ImageAdapter.MyViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ImageAdapter.MyViewHolder holder, int position) {
-
         ImageModel model = imageModels.get(position);
         holder.title.setText(model.getTitle());
         holder.id.setText("ID: " + model.getId());
@@ -61,8 +64,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
             e.printStackTrace();
         }
         boolean inDatabase = false;
-        for(int i = 0; i < imageInDatabase.size(); i++){
-            if(imageInDatabase.get(i).getId().equals(model.getId())){
+        for(int i = 0; i < finalImageInDatabase.size(); i++){
+            if(finalImageInDatabase.get(i).getId().equals(model.getId())){
                 inDatabase = true;
             }
         }
@@ -81,18 +84,21 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
                 databaseInstance.insertImages(model.getId(), model.getAlbumId(), model.getTitle(), model.getUrl(), model.getThumbnailUrl());
                 holder.button.setText("Remove");
                 if(!finalInDatabase){
+                    finalImageInDatabase.clear();
                     imageInDatabase.add(model);
+                    finalImageInDatabase.addAll(imageInDatabase);
                 }
                 holder.button.setBackgroundColor(context.getResources().getColor(R.color.red_alert));
-                updateComparisonTable(imageInDatabase);
+                updateComparisonTable(finalImageInDatabase);
             }
             else{
                 databaseInstance.deleteImageData(model.getId());
                 holder.button.setText("Compare");
+                finalImageInDatabase.clear();
                 imageInDatabase.remove(model);
-
+                finalImageInDatabase.addAll(imageInDatabase);
                 holder.button.setBackgroundColor(context.getResources().getColor(R.color.app_color));
-                updateComparisonTable(imageInDatabase);
+                updateComparisonTable(finalImageInDatabase);
             }
 
         });
