@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_view);
         relativeLayout = findViewById(R.id.parent_layout);
         listView = findViewById(R.id.list_comparison_table);
-        imagesFromDatabase = databaseInstance.getAllImages();
+
         apiCallForGetImages();
     }
 
@@ -125,8 +125,8 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("NotifyDataSetChanged")
     public void fillDataInRecyclerView(List<ImageModel> imageModels){
+        ImageAdapter imageAdapter = new ImageAdapter(MainActivity.this, imageModels, listView);
         recyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this, 2));
-        ImageAdapter imageAdapter = new ImageAdapter(MainActivity.this, imageModels, imagesFromDatabase, listView);
         recyclerView.setAdapter(imageAdapter);
         imageAdapter.notifyDataSetChanged();
         /*imagesFromDatabase = imageAdapter.getSavedImagesFromRecycler();

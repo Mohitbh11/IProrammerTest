@@ -20,6 +20,7 @@ import com.mohit.iprogrammertest.manager.DatabaseInstance;
 import com.mohit.iprogrammertest.model.ImageModel;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder> {
@@ -29,11 +30,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
     DatabaseInstance databaseInstance;
     ListView listView;
 
-    public ImageAdapter(Context context, List<ImageModel> imageModels, List<ImageModel> imageInDatabase, ListView listView) {
+    public ImageAdapter(Context context, List<ImageModel> imageModels, ListView listView) {
         this.context = context;
         this.imageModels = imageModels;
-        this.imageInDatabase = imageInDatabase;
         this.listView = listView;
+        imageInDatabase = new ArrayList<>();
     }
 
     @NonNull
@@ -42,6 +43,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
         View view = LayoutInflater.from(parent.getContext()).
                 inflate(R.layout.layout_image_details_row, parent, false);
         databaseInstance = new DatabaseInstance(context);
+        imageInDatabase = databaseInstance.getAllImages();
         return new ImageAdapter.MyViewHolder(view);
     }
 
@@ -62,7 +64,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
         for(int i = 0; i < imageInDatabase.size(); i++){
             if(imageInDatabase.get(i).getId().equals(model.getId())){
                 inDatabase = true;
-                updateComparisonTable(imageInDatabase);
             }
         }
         if(inDatabase){
@@ -124,7 +125,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
     }
 
 
-    void updateComparisonTable(List<ImageModel> imageInDB){
+    public void updateComparisonTable(List<ImageModel> imageInDB){
         CompareTableAdapter compareTableAdapter = new CompareTableAdapter(context, imageInDB);
         listView.setAdapter(compareTableAdapter);
         compareTableAdapter.notifyDataSetChanged();
